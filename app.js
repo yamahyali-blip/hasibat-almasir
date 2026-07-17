@@ -164,7 +164,7 @@
   setBasicMode("speed");updateDirection();
   if("serviceWorker" in navigator){
     window.addEventListener("load",function(){
-      navigator.serviceWorker.register("./service-worker.js?v=5").then(function(reg){reg.update();}).catch(function(){});
+      navigator.serviceWorker.register("./service-worker.js?v=8").then(function(reg){reg.update();}).catch(function(){});
     });
   }
 })();

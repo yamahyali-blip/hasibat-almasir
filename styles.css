@@ -88,8 +88,8 @@ h2{margin:0;color:var(--green);font-size:27px}
 .form-grid{display:grid;gap:10px;align-items:end}
 .pass-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .light-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:10px}
-.daynight-main-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.basic-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.daynight-main-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.basic-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-auto-flow:row}
 .direction-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .form-grid label{display:flex;flex-direction:column;gap:6px;min-width:0;font-weight:900;font-size:15px}
 input,select{width:100%;min-width:0;padding:11px 10px;border:1px solid var(--border);border-radius:11px;background:#fff;color:var(--text);font-size:16px;outline:none}
@@ -119,8 +119,8 @@ body.dark h2,body.dark .identity strong,body.dark .identity p{color:#d8ba6d}
 body.dark .panel-heading{border-bottom-color:#334155}
 
 @media(max-width:1150px){
-  .daynight-main-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .basic-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .daynight-main-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  .basic-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-auto-flow:row}
   .direction-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tabs button{font-size:15px}
 }
@@ -133,7 +133,9 @@ body.dark .panel-heading{border-bottom-color:#334155}
 }
 @media(max-width:700px){
   .app-shell{padding:10px}
-  .pass-grid,.light-grid,.daynight-main-grid,.basic-grid,.direction-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pass-grid,.light-grid,.direction-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .basic-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .daynight-main-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   .compact-actions{display:grid;grid-template-columns:1fr 1fr}
   .compact-actions button{min-width:0;width:100%}
 }
@@ -146,7 +148,8 @@ body.dark .panel-heading{border-bottom-color:#334155}
   .portrait.mbz{object-position:42% 18%}.portrait.zayed{object-position:45% 25%;transform:scale(1.22)}
 }
 @media(max-width:470px){
-  .pass-grid,.light-grid,.daynight-main-grid,.basic-grid,.direction-grid{grid-template-columns:1fr}
+  .pass-grid,.light-grid,.direction-grid{grid-template-columns:1fr}
+  .basic-grid,.daynight-main-grid{grid-template-columns:1fr!important}
   .tabs{grid-template-columns:repeat(4,minmax(145px,1fr))}
 }
 @media(max-width:390px){
@@ -154,3 +157,38 @@ body.dark .panel-heading{border-bottom-color:#334155}
   .uae-flag{width:78px;height:45px}.logo-medallion{width:52px;height:52px}.forces-logo{width:44px;height:44px}
 }
 @media print{.utility-bar,.tabs{display:none!important}body{background:#fff}.panel{display:block!important;box-shadow:none;margin-bottom:12px}.version{display:none}}
+
+/* الإصدار 8: ترتيب السير نهار/ليل في صفين ثابتين على الشاشات الكبيرة */
+.basic-grid > label:not(.hidden){min-width:0}
+#panel-basic .basic-grid{width:100%}
+#panel-daynight .light-grid,#panel-daynight .daynight-main-grid{width:100%}
+
+
+/* الإصدار 8: صف الضوء ثم صف بيانات السير */
+#panel-daynight .light-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-template-areas:"first last";
+  gap:12px;
+  margin-bottom:12px;
+}
+#panel-daynight .light-grid label:nth-child(1){grid-area:first}
+#panel-daynight .light-grid label:nth-child(2){grid-area:last}
+#panel-daynight .daynight-main-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-areas:"start distance day night";
+  gap:12px;
+}
+#panel-daynight .daynight-main-grid label:nth-child(1){grid-area:start}
+#panel-daynight .daynight-main-grid label:nth-child(2){grid-area:distance}
+#panel-daynight .daynight-main-grid label:nth-child(3){grid-area:day}
+#panel-daynight .daynight-main-grid label:nth-child(4){grid-area:night}
+@media(max-width:700px){
+  #panel-daynight .light-grid{grid-template-columns:1fr 1fr!important;grid-template-areas:"first last"}
+  #panel-daynight .daynight-main-grid{grid-template-columns:1fr 1fr!important;grid-template-areas:"start distance" "day night"}
+}
+@media(max-width:470px){
+  #panel-daynight .light-grid{grid-template-columns:1fr!important;grid-template-areas:"first" "last"}
+  #panel-daynight .daynight-main-grid{grid-template-columns:1fr!important;grid-template-areas:"start" "distance" "day" "night"}
+}
