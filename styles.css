@@ -87,8 +87,9 @@ h2{margin:0;color:var(--green);font-size:27px}
 
 .form-grid{display:grid;gap:10px;align-items:end}
 .pass-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-.daynight-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
-.basic-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.light-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:10px}
+.daynight-main-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.basic-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .direction-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .form-grid label{display:flex;flex-direction:column;gap:6px;min-width:0;font-weight:900;font-size:15px}
 input,select{width:100%;min-width:0;padding:11px 10px;border:1px solid var(--border);border-radius:11px;background:#fff;color:var(--text);font-size:16px;outline:none}
@@ -118,8 +119,9 @@ body.dark h2,body.dark .identity strong,body.dark .identity p{color:#d8ba6d}
 body.dark .panel-heading{border-bottom-color:#334155}
 
 @media(max-width:1150px){
-  .daynight-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .basic-grid,.direction-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .daynight-main-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .basic-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .direction-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tabs button{font-size:15px}
 }
 @media(max-width:900px){
@@ -131,7 +133,7 @@ body.dark .panel-heading{border-bottom-color:#334155}
 }
 @media(max-width:700px){
   .app-shell{padding:10px}
-  .pass-grid,.daynight-grid,.basic-grid,.direction-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pass-grid,.light-grid,.daynight-main-grid,.basic-grid,.direction-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .compact-actions{display:grid;grid-template-columns:1fr 1fr}
   .compact-actions button{min-width:0;width:100%}
 }
@@ -144,7 +146,7 @@ body.dark .panel-heading{border-bottom-color:#334155}
   .portrait.mbz{object-position:42% 18%}.portrait.zayed{object-position:45% 25%;transform:scale(1.22)}
 }
 @media(max-width:470px){
-  .pass-grid,.daynight-grid,.basic-grid,.direction-grid{grid-template-columns:1fr}
+  .pass-grid,.light-grid,.daynight-main-grid,.basic-grid,.direction-grid{grid-template-columns:1fr}
   .tabs{grid-template-columns:repeat(4,minmax(145px,1fr))}
 }
 @media(max-width:390px){

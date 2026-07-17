@@ -1,6 +1,6 @@
-const CACHE = "movement-calculator-v5";
+const CACHE = "movement-calculator-v6";
 const CORE = [
-  "./","./index.html","./styles.css?v=5","./app.js?v=5","./manifest.webmanifest",
+  "./","./index.html","./styles.css?v=6","./app.js?v=6","./manifest.webmanifest",
   "./assets/mbz-camo.jpg","./assets/zayed.jpg","./assets/forces-logo.png",
   "./icons/icon-180.png","./icons/icon-192.png","./icons/icon-512.png"
 ];

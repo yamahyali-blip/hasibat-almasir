@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
   <title>حاسبة المسير</title>
 </head>
 <body>
@@ -116,7 +116,15 @@
         <h2>حساب السير نهارًا وليلًا</h2>
         <p class="hint">جميع المتطلبات في صف واحد، ويقسّم البرنامج المسافة تلقائيًا بين النهار والليل.</p>
       </div>
-      <div class="form-grid daynight-grid">
+      <div class="form-grid light-grid">
+        <label>أول ضوء
+          <input id="dnFirstLight" type="time" value="06:00">
+        </label>
+        <label>آخر ضوء
+          <input id="dnLastLight" type="time" value="18:30">
+        </label>
+      </div>
+      <div class="form-grid daynight-main-grid">
         <label>وقت الانطلاق
           <input id="dnStart" type="time" value="13:30">
         </label>
@@ -128,12 +136,6 @@
         </label>
         <label>سرعة الليل
           <input id="dnNightSpeed" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="50">
-        </label>
-        <label>أول ضوء
-          <input id="dnFirstLight" type="time" value="06:00">
-        </label>
-        <label>آخر ضوء
-          <input id="dnLastLight" type="time" value="18:30">
         </label>
       </div>
       <div class="actions compact-actions">
@@ -173,9 +175,9 @@
     </section>
 
     <div id="status" class="status" aria-live="polite"></div>
-    <div class="version">الإصدار المعدّل 5</div>
+    <div class="version">الإصدار المعدّل 6</div>
   </main>
 
-  <script src="app.js?v=5" defer></script>
+  <script src="app.js?v=6" defer></script>
 </body>
 </html>
