@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#075c35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="حاسبة المسير">
+  <title>حاسبة المسير</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-180.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="hero">
+    <img class="portrait left" src="./assets/mbz-camo.jpg" alt="صورة باللباس العسكري المموه">
+    <div class="hero-center">
+      <div class="uae-flag" aria-label="علم الإمارات">
+        <span class="red"></span>
+        <span class="green"></span>
+        <span class="white"></span>
+        <span class="black"></span>
+      </div>
+      <img class="forces-logo" src="./assets/forces-logo.png" alt="شعار القوات المسلحة">
+    </div>
+    <img class="portrait right" src="./assets/zayed.jpg" alt="صورة الشيخ زايد رافعًا يده">
+  </header>
+
+  <section class="identity">
+    <div>دولة الإمارات العربية المتحدة</div>
+    <div>القوات المسلحة</div>
+    <h1>حاسبة المسير</h1>
+    <p>زمن المرور • السير نهارًا وليلًا • المسافة والسرعة والزمن</p>
+    <strong>إهداء من مقدم ركن متقاعد / علي راشد بن عْليوه اليماحي</strong>
+  </section>
+
+  <main class="app-shell">
+    <div class="utility-bar">
+      <button id="darkBtn" type="button">🌙 الوضع الليلي</button>
+      <button id="shareBtn" type="button">📤 مشاركة</button>
+      <button id="printBtn" type="button">🖨️ حفظ PDF</button>
+    </div>
+
+    <nav class="tabs" aria-label="أقسام الحاسبة">
+      <button class="tab active" data-tab="pass" type="button">1) زمن المرور بنقطة</button>
+      <button class="tab" data-tab="daynight" type="button">2) السير نهار/ليل</button>
+      <button class="tab" data-tab="basic" type="button">3) المسافة والسرعة والزمن</button>
+    </nav>
+
+    <section class="panel active" id="panel-pass">
+      <h2>حساب زمن المرور بنقطة</h2>
+      <p class="hint">أدخل عدد السيارات والسرعة والكثافة.</p>
+      <div class="form-grid">
+        <label>عدد السيارات<input id="pCars" type="number" min="1" inputmode="numeric" placeholder="50"></label>
+        <label>السرعة (كم/ساعة)<input id="pSpeed" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="75"></label>
+        <label class="wide">الكثافة<input id="pDensity" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="20"></label>
+      </div>
+      <div class="actions">
+        <button id="calcPassBtn" class="primary" type="button">احسب زمن المرور</button>
+        <button id="clearPassBtn" type="button">مسح</button>
+      </div>
+      <div id="passResult" class="result" aria-live="polite"></div>
+      <div class="formula">تقريب لأعلى ((عدد السيارات × 60) ÷ (السرعة × الكثافة)) + تقريب لأعلى ((عدد السيارات × 2) ÷ 25)</div>
+    </section>
+
+    <section class="panel" id="panel-daynight">
+      <h2>حساب السير نهارًا وليلًا</h2>
+      <p class="hint">يقسّم البرنامج المسافة تلقائيًا عند الانتقال بين النهار والليل.</p>
+      <div class="form-grid">
+        <label>وقت الانطلاق<input id="dnStart" type="time" value="13:30"></label>
+        <label>المسافة (كم)<input id="dnDistance" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="200"></label>
+        <label>سرعة النهار<input id="dnDaySpeed" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="75"></label>
+        <label>سرعة الليل<input id="dnNightSpeed" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="50"></label>
+        <label>أول ضوء<input id="dnFirstLight" type="time" value="06:00"></label>
+        <label>آخر ضوء<input id="dnLastLight" type="time" value="18:30"></label>
+      </div>
+      <div class="actions">
+        <button id="calcDayNightBtn" class="primary" type="button">احسب السير</button>
+        <button id="clearDayNightBtn" type="button">مسح</button>
+      </div>
+      <div id="dayNightResult" class="result" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" id="panel-basic">
+      <h2>حساب المسافة والسرعة والزمن</h2>
+      <p class="hint">اختر العملية المطلوبة، وسيظهر فقط ما يجب إدخاله.</p>
+
+      <div class="operation-buttons">
+        <button class="operation active" data-mode="speed" type="button">حساب السرعة</button>
+        <button class="operation" data-mode="distance" type="button">حساب المسافة</button>
+        <button class="operation" data-mode="time" type="button">حساب الزمن</button>
+      </div>
+
+      <div class="form-grid">
+        <label id="basicDistanceWrap">المسافة (كم)<input id="basicDistance" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="120"></label>
+        <label id="basicSpeedWrap" class="hidden">السرعة (كم/ساعة)<input id="basicSpeed" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="60"></label>
+        <label id="basicHoursWrap">الساعات<input id="basicHours" type="number" min="0" inputmode="numeric" placeholder="2"></label>
+        <label id="basicMinutesWrap">الدقائق<input id="basicMinutes" type="number" min="0" max="59" inputmode="numeric" placeholder="30"></label>
+      </div>
+      <div class="actions">
+        <button id="calcBasicBtn" class="primary" type="button">احسب السرعة</button>
+        <button id="clearBasicBtn" type="button">مسح</button>
+      </div>
+      <div id="basicResult" class="result" aria-live="polite"></div>
+
+      <div class="subpanel">
+        <h2>الحساب الأمامي والعكسي</h2>
+        <div class="form-grid">
+          <label class="wide">نوع الحساب
+            <select id="directionMode">
+              <option value="forward">حساب أمامي</option>
+              <option value="reverse">حساب عكسي</option>
+            </select>
+          </label>
+          <label><span id="baseTimeLabel">وقت الانطلاق</span><input id="baseTime" type="time" value="13:30"></label>
+          <label>المسافة (كم)<input id="directionDistance" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="150"></label>
+          <label class="wide">السرعة (كم/ساعة)<input id="directionSpeed" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="75"></label>
+        </div>
+        <div class="actions">
+          <button id="calcDirectionBtn" class="primary" type="button">احسب أمامي</button>
+          <button id="clearDirectionBtn" type="button">مسح</button>
+        </div>
+        <div id="directionResult" class="result" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <div id="status" class="status" aria-live="polite"></div>
+  </main>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
