@@ -1,52 +1,62 @@
-
 (function(){
   "use strict";
+
   var currentBasicMode = "speed";
   function id(x){ return document.getElementById(x); }
   function num(x){ return parseFloat(id(x).value); }
   function positive(){
     for(var i=0;i<arguments.length;i++){
-      if(!isFinite(arguments[i]) || arguments[i] <= 0) return false;
+      if(!Number.isFinite(arguments[i]) || arguments[i] <= 0) return false;
     }
     return true;
   }
-  function showResult(el, html){ el.className="result show"; el.innerHTML=html; }
-  function clearResult(el){ el.className="result"; el.innerHTML=""; }
-  function pad(n){ return n<10 ? "0"+n : String(n); }
+  function pad(n){ return n < 10 ? "0"+n : String(n); }
   function hmToMin(value){
     if(!value) return NaN;
     var p=value.split(":");
     return Number(p[0])*60+Number(p[1]);
   }
   function minToClock(value){
-    value=((Math.round(value)%1440)+1440)%1440;
-    return pad(Math.floor(value/60))+":"+pad(value%60);
+    var m=Math.round(value);
+    m=((m%1440)+1440)%1440;
+    return pad(Math.floor(m/60))+":"+pad(m%60);
   }
-  function durationText(value){
-    var m=Math.round(value), h=Math.floor(m/60), mm=m%60, out="";
-    if(h) out+=h+" ساعة";
-    if(h && mm) out+=" و ";
-    if(mm) out+=mm+" دقيقة";
-    return out || "0 دقيقة";
+  function durationText(minutes){
+    var total=Math.round(minutes);
+    var h=Math.floor(total/60), m=total%60;
+    if(h && m) return h+" ساعة و"+m+" دقيقة";
+    if(h) return h+" ساعة";
+    return m+" دقيقة";
   }
-  function isDay(t, first, last){
-    var x=((t%1440)+1440)%1440;
-    return x>=first && x<last;
+  function showResult(el,html){ el.className="result show"; el.innerHTML=html; }
+  function clearResult(el){ el.className="result"; el.innerHTML=""; }
+  function isDay(minute,first,last){
+    var t=((minute%1440)+1440)%1440;
+    return first <= last ? (t>=first && t<last) : (t>=first || t<last);
   }
   function splitTravel(start,distance,daySpeed,nightSpeed,first,last){
-    var t=start, remain=distance, dayMin=0, nightMin=0, dayKm=0, nightKm=0, guard=0;
-    while(remain>0.000001 && guard++<10000){
+    var t=start, remaining=distance, dayMin=0, nightMin=0, dayKm=0, nightKm=0, guard=0;
+    while(remaining>0.000001 && guard++<10000){
       var day=isDay(t,first,last);
       var speed=day?daySpeed:nightSpeed;
       var tod=((t%1440)+1440)%1440;
-      var boundary=day ? t+(last-tod) : (tod<first ? t+(first-tod) : t+(1440-tod)+first);
-      var available=boundary-t;
+      var boundary;
+      if(day){
+        boundary=t+(last-tod);
+      }else if(tod<first){
+        boundary=t+(first-tod);
+      }else{
+        boundary=t+((1440-tod)+first);
+      }
+      var available=Math.max(0,boundary-t);
+      if(available<0.000001) available=1440;
       var possible=speed*(available/60);
-      var usedKm=Math.min(remain,possible);
+      var usedKm=Math.min(remaining,possible);
       var usedMin=(usedKm/speed)*60;
       if(day){dayKm+=usedKm;dayMin+=usedMin;}else{nightKm+=usedKm;nightMin+=usedMin;}
-      t+=usedMin; remain-=usedKm;
-      if(remain>0.000001 && usedKm>=possible-0.000001) t=boundary;
+      remaining-=usedKm;
+      t+=usedMin;
+      if(remaining>0.000001 && usedKm>=possible-0.000001) t=boundary;
     }
     return {end:t,dayMin:dayMin,nightMin:nightMin,dayKm:dayKm,nightKm:nightKm,totalMin:dayMin+nightMin};
   }
@@ -62,26 +72,28 @@
 
   id("calcPassBtn").addEventListener("click",function(){
     var cars=num("pCars"),speed=num("pSpeed"),density=num("pDensity");
-    if(!positive(cars,speed,density)){showResult(id("passResult"),'<span class="error">أدخل أرقامًا صحيحة أكبر من صفر.</span>');return;}
+    if(!positive(cars,speed,density)){
+      showResult(id("passResult"),'<span class="error">أدخل أرقامًا صحيحة أكبر من صفر.</span>');return;
+    }
     var a=Math.ceil((cars*60)/(speed*density));
     var b=Math.ceil((cars*2)/25);
     showResult(id("passResult"),'<div>زمن المرور</div><div class="big">'+(a+b)+' دقيقة</div><div>الجزء الأول: '+a+' دقيقة — الجزء الثاني: '+b+' دقيقة</div>');
   });
   id("clearPassBtn").addEventListener("click",function(){
-    ["pCars","pSpeed","pDensity"].forEach(function(x){id(x).value="";});
-    clearResult(id("passResult"));
+    ["pCars","pSpeed","pDensity"].forEach(function(x){id(x).value="";});clearResult(id("passResult"));
   });
 
   id("calcDayNightBtn").addEventListener("click",function(){
     var start=id("dnStart").value,dist=num("dnDistance"),ds=num("dnDaySpeed"),ns=num("dnNightSpeed");
     var first=id("dnFirstLight").value,last=id("dnLastLight").value;
-    if(!start||!first||!last||!positive(dist,ds,ns)){showResult(id("dayNightResult"),'<span class="error">أكمل جميع البيانات بقيم صحيحة.</span>');return;}
+    if(!start||!first||!last||!positive(dist,ds,ns)){
+      showResult(id("dayNightResult"),'<span class="error">أكمل جميع البيانات بقيم صحيحة.</span>');return;
+    }
     var r=splitTravel(hmToMin(start),dist,ds,ns,hmToMin(first),hmToMin(last));
     showResult(id("dayNightResult"),'<div>النتيجة</div><div class="big">الوصول '+minToClock(r.end)+'</div><div>زمن السير: '+durationText(r.totalMin)+'</div><div>نهارًا: '+r.dayKm.toFixed(2)+' كم — '+r.dayMin.toFixed(2)+' دقيقة</div><div>ليلًا: '+r.nightKm.toFixed(2)+' كم — '+r.nightMin.toFixed(2)+' دقيقة</div>');
   });
   id("clearDayNightBtn").addEventListener("click",function(){
-    ["dnDistance","dnDaySpeed","dnNightSpeed"].forEach(function(x){id(x).value="";});
-    clearResult(id("dayNightResult"));
+    ["dnDistance","dnDaySpeed","dnNightSpeed"].forEach(function(x){id(x).value="";});clearResult(id("dayNightResult"));
   });
 
   function setBasicMode(mode){
@@ -94,12 +106,10 @@
     id("calcBasicBtn").textContent=mode==="speed"?"احسب السرعة":mode==="distance"?"احسب المسافة":"احسب الزمن";
     clearResult(id("basicResult"));
   }
-  document.querySelectorAll(".operation").forEach(function(btn){
-    btn.addEventListener("click",function(){setBasicMode(btn.dataset.mode);});
-  });
-
+  document.querySelectorAll(".operation").forEach(function(btn){btn.addEventListener("click",function(){setBasicMode(btn.dataset.mode);});});
   id("calcBasicBtn").addEventListener("click",function(){
-    var d=num("basicDistance"),s=num("basicSpeed"),h=parseFloat(id("basicHours").value)||0,m=parseFloat(id("basicMinutes").value)||0,total=h*60+m;
+    var d=num("basicDistance"),s=num("basicSpeed");
+    var h=parseFloat(id("basicHours").value)||0,m=parseFloat(id("basicMinutes").value)||0,total=h*60+m;
     if(currentBasicMode==="speed"){
       if(!positive(d,total)){showResult(id("basicResult"),'<span class="error">أدخل المسافة والزمن.</span>');return;}
       showResult(id("basicResult"),'<div>السرعة</div><div class="big">'+(d/(total/60)).toFixed(2)+' كم/ساعة</div>');
@@ -113,13 +123,13 @@
     }
   });
   id("clearBasicBtn").addEventListener("click",function(){
-    ["basicDistance","basicSpeed","basicHours","basicMinutes"].forEach(function(x){id(x).value="";});
-    clearResult(id("basicResult"));
+    ["basicDistance","basicSpeed"].forEach(function(x){id(x).value="";});
+    id("basicHours").value="0";id("basicMinutes").value="0";clearResult(id("basicResult"));
   });
 
   function updateDirection(){
     var reverse=id("directionMode").value==="reverse";
-    id("baseTimeLabel").textContent=reverse?"وقت الوصول":"وقت الانطلاق";
+    id("baseTimeText").textContent=reverse?"وقت الوصول":"وقت الانطلاق";
     id("calcDirectionBtn").textContent=reverse?"احسب عكسي":"احسب أمامي";
     clearResult(id("directionResult"));
   }
@@ -127,13 +137,12 @@
   id("calcDirectionBtn").addEventListener("click",function(){
     var base=id("baseTime").value,d=num("directionDistance"),s=num("directionSpeed");
     if(!base||!positive(d,s)){showResult(id("directionResult"),'<span class="error">أدخل الوقت والمسافة والسرعة.</span>');return;}
-    var total=(d/s)*60, reverse=id("directionMode").value==="reverse";
+    var total=(d/s)*60,reverse=id("directionMode").value==="reverse";
     var result=hmToMin(base)+(reverse?-total:total);
     showResult(id("directionResult"),'<div>'+(reverse?'وقت الانطلاق':'وقت الوصول')+'</div><div class="big">'+minToClock(result)+'</div><div>زمن السير: '+durationText(total)+'</div>');
   });
   id("clearDirectionBtn").addEventListener("click",function(){
-    id("baseTime").value="13:30";id("directionDistance").value="";id("directionSpeed").value="";
-    clearResult(id("directionResult"));
+    id("baseTime").value="13:30";id("directionDistance").value="";id("directionSpeed").value="";clearResult(id("directionResult"));
   });
 
   id("darkBtn").addEventListener("click",function(){
@@ -144,22 +153,18 @@
   id("shareBtn").addEventListener("click",function(){
     var text="حاسبة المسير";
     document.querySelectorAll(".result.show").forEach(function(x){text+="\n"+x.textContent.trim();});
-    if(navigator.share){
-      navigator.share({title:"حاسبة المسير",text:text}).catch(function(){});
-    }else{
+    if(navigator.share){navigator.share({title:"حاسبة المسير",text:text}).catch(function(){});}
+    else{
       var ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();
-      try{document.execCommand("copy");id("status").textContent="تم نسخ النتيجة";}catch(e){id("status").textContent="استخدم زر المشاركة في Safari";}
-      document.body.removeChild(ta);
-      setTimeout(function(){id("status").textContent="";},2500);
+      try{document.execCommand("copy");id("status").textContent="تم نسخ النتيجة";}catch(e){id("status").textContent="استخدم زر المشاركة في المتصفح";}
+      document.body.removeChild(ta);setTimeout(function(){id("status").textContent="";},2500);
     }
   });
 
-  setBasicMode("speed");
-  updateDirection();
-
+  setBasicMode("speed");updateDirection();
   if("serviceWorker" in navigator){
     window.addEventListener("load",function(){
-      navigator.serviceWorker.register("./service-worker.js").catch(function(){});
+      navigator.serviceWorker.register("./service-worker.js?v=4").then(function(reg){reg.update();}).catch(function(){});
     });
   }
 })();
